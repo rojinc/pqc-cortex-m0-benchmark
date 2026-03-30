@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-03-19T07:46:55.976499+00:00",
+  "platform": {
+    "system": "Windows",
+    "release": "11",
+    "version": "10.0.26200",
+    "machine": "AMD64"
+  },
+  "compiler": {
+    "arm_none_eabi_gcc": "arm-none-eabi-gcc (Arm GNU Toolchain 12.2.MPACBTI-Rel1 (Build arm-12-mpacbti.34)) 12.2.1 20230214"
+  },
+  "pqclean": {
+    "commit": "3730b32aa50ba9e712592c1476bdd048f5f6ed7e",
+    "tag": "round3-240-g3730b32a"
+  },
+  "pico_sdk": {
+    "commit": "a1438dff1d38bd9c65dbd693f0e5db4b9ae91779",
+    "tag": "2.2.0"
+  },
+  "python": "3.13.12",
+  "repo": {
+    "commit": "b7aef12c0ecc0d2415d922356d571ef637cbce18",
+    "dirty": true
+  }
+}

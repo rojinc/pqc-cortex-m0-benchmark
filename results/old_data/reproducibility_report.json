@@ -1,0 +1,444 @@
+{
+  "timestamp": "2026-03-19T11:11:20.435261+00:00",
+  "run1": "C:\\Users\\info\\Desktop\\PQC-research\\results\\raw_run1",
+  "run2": "C:\\Users\\info\\Desktop\\PQC-research\\results\\raw_run2",
+  "summary": {
+    "total": 25,
+    "pass": 23,
+    "warn": 1,
+    "fail": 1,
+    "reproducible": false
+  },
+  "thresholds": {
+    "mean_diff_warn_pct": 2.0,
+    "mean_diff_fail_pct": 5.0,
+    "variable_ops_multiplier": 3
+  },
+  "comparisons": [
+    {
+      "algorithm": "ECDH-P256",
+      "operation": "key_agreement",
+      "security_level": 256,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0375,
+      "details": {
+        "mean1": 617490.6333333333,
+        "mean2": 617259.0666666667,
+        "cv1": 0.2892511289489232,
+        "cv2": 0.32842202641106005,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.46944286306753935,
+        "p_val": 0.6405410299844527
+      }
+    },
+    {
+      "algorithm": "ECDSA-P256",
+      "operation": "keygen",
+      "security_level": 256,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.1035,
+      "details": {
+        "mean1": 83663.93333333333,
+        "mean2": 83577.3,
+        "cv1": 0.384878498716521,
+        "cv2": 0.4239461887798008,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.991079475294769,
+        "p_val": 0.325800803332674
+      }
+    },
+    {
+      "algorithm": "ECDSA-P256",
+      "operation": "sign",
+      "security_level": 256,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0366,
+      "details": {
+        "mean1": 92488.83333333333,
+        "mean2": 92522.7,
+        "cv1": 0.34998883927468416,
+        "cv2": 0.43547209985639784,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": -0.3589059890404675,
+        "p_val": 0.721029012238886
+      }
+    },
+    {
+      "algorithm": "ECDSA-P256",
+      "operation": "verify",
+      "security_level": 256,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.3142,
+      "details": {
+        "mean1": 319624.36666666664,
+        "mean2": 320628.5,
+        "cv1": 0.03602370495524058,
+        "cv2": 0.027560339356612503,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": -37.893220469080404,
+        "p_val": 8.998386499104691e-41
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "keygen",
+      "security_level": 44,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.1569,
+      "details": {
+        "mean1": 39936.23333333333,
+        "mean2": 39873.566666666666,
+        "cv1": 0.9109266484874156,
+        "cv2": 0.8699641099682067,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.6828385767880367,
+        "p_val": 0.4974334543895616
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "keygen",
+      "security_level": 65,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0014,
+      "details": {
+        "mean1": 68399.3,
+        "mean2": 68398.33333333333,
+        "cv1": 0.09499580827412975,
+        "cv2": 0.09985728861091324,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.05616444784471941,
+        "p_val": 0.9554043172052632
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "keygen",
+      "security_level": 87,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0001,
+      "details": {
+        "mean1": 114350.83333333333,
+        "mean2": 114351.0,
+        "cv1": 0.34100208802934406,
+        "cv2": 0.3761363013750386,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": -0.0015723931427899108,
+        "p_val": 0.9987508595562132
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "sign",
+      "security_level": 44,
+      "verdict": "PASS",
+      "mean_diff_pct": 4.1756,
+      "details": {
+        "mean1": 169204.3,
+        "mean2": 162139.02,
+        "cv1": 70.79816189316912,
+        "cv2": 53.86815037649533,
+        "n1": 100,
+        "n2": 100,
+        "t_stat": 0.47656867486988935,
+        "p_val": 0.6342439085479115
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "sign",
+      "security_level": 65,
+      "verdict": "PASS",
+      "mean_diff_pct": 3.3711,
+      "details": {
+        "mean1": 277352.12,
+        "mean2": 268002.17,
+        "cv1": 62.96851411425154,
+        "cv2": 76.43008990842449,
+        "n1": 100,
+        "n2": 100,
+        "t_stat": 0.34734954352204106,
+        "p_val": 0.7287068858875694
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "sign",
+      "security_level": 87,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.5967,
+      "details": {
+        "mean1": 331993.86,
+        "mean2": 330012.77,
+        "cv1": 61.19242086615324,
+        "cv2": 60.060913208167236,
+        "n1": 100,
+        "n2": 100,
+        "t_stat": 0.069798817566613,
+        "p_val": 0.9444242742455317
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "verify",
+      "security_level": 44,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0073,
+      "details": {
+        "mean1": 43977.73333333333,
+        "mean2": 43974.53333333333,
+        "cv1": 0.06123312431281244,
+        "cv2": 0.06649989081564675,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.44089770150826446,
+        "p_val": 0.6609372181743005
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "verify",
+      "security_level": 65,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0018,
+      "details": {
+        "mean1": 72195.93333333333,
+        "mean2": 72194.63333333333,
+        "cv1": 0.025638413242997732,
+        "cv2": 0.02507411936502607,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.2750222815020426,
+        "p_val": 0.7842769537455245
+      }
+    },
+    {
+      "algorithm": "ML-DSA",
+      "operation": "verify",
+      "security_level": 87,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0028,
+      "details": {
+        "mean1": 120306.3,
+        "mean2": 120309.63333333333,
+        "cv1": 0.022749168860425495,
+        "cv2": 0.02133518783917614,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": -0.4865781263765759,
+        "p_val": 0.6283984775956425
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "decaps",
+      "security_level": 512,
+      "verdict": "PASS",
+      "mean_diff_pct": 1.7437,
+      "details": {
+        "mean1": 14530.333333333334,
+        "mean2": 14276.966666666667,
+        "cv1": 0.20509420544868756,
+        "cv2": 0.189954664835242,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 34.44087048778063,
+        "p_val": 4.4820843375490235e-40
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "decaps",
+      "security_level": 768,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0263,
+      "details": {
+        "mean1": 22035.866666666665,
+        "mean2": 22030.066666666666,
+        "cv1": 0.08737039995968258,
+        "cv2": 0.09411985821236528,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 1.1227458321635584,
+        "p_val": 0.2661968848404586
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "decaps",
+      "security_level": 1024,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0121,
+      "details": {
+        "mean1": 32440.733333333334,
+        "mean2": 32436.8,
+        "cv1": 0.04791850423119266,
+        "cv2": 0.041680575546036866,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 1.0457186981844324,
+        "p_val": 0.3001126588001885
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "encaps",
+      "security_level": 512,
+      "verdict": "WARN",
+      "mean_diff_pct": 2.0894,
+      "details": {
+        "mean1": 11791.4,
+        "mean2": 11545.033333333333,
+        "cv1": 0.24863081566960507,
+        "cv2": 0.19281854479224317,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 36.65780699582963,
+        "p_val": 6.929388544291207e-40
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "encaps",
+      "security_level": 768,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0047,
+      "details": {
+        "mean1": 18574.833333333332,
+        "mean2": 18575.7,
+        "cv1": 0.11225405701366718,
+        "cv2": 0.11554839505449856,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": -0.1586311841033294,
+        "p_val": 0.8745109764050214
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "encaps",
+      "security_level": 1024,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0096,
+      "details": {
+        "mean1": 28078.2,
+        "mean2": 28075.5,
+        "cv1": 0.06184529686406238,
+        "cv2": 0.04785778382095207,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.673542717805304,
+        "p_val": 0.5034453784703428
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "keygen",
+      "security_level": 512,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.1982,
+      "details": {
+        "mean1": 9939.7,
+        "mean2": 9920.0,
+        "cv1": 1.4952314105961098,
+        "cv2": 1.3901841231587304,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.5321960412366745,
+        "p_val": 0.5966344271942988
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "keygen",
+      "security_level": 768,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.1109,
+      "details": {
+        "mean1": 16024.733333333334,
+        "mean2": 16006.966666666667,
+        "cv1": 0.5859082018730134,
+        "cv2": 0.4425118445875005,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.8273969135499463,
+        "p_val": 0.4116581093441282
+      }
+    },
+    {
+      "algorithm": "ML-KEM",
+      "operation": "keygen",
+      "security_level": 1024,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0301,
+      "details": {
+        "mean1": 25165.833333333332,
+        "mean2": 25158.266666666666,
+        "cv1": 0.3668166592849053,
+        "cv2": 0.4363413739183486,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.2889504133611741,
+        "p_val": 0.7736798453237872
+      }
+    },
+    {
+      "algorithm": "RSA-2048",
+      "operation": "decrypt",
+      "security_level": 2048,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.2786,
+      "details": {
+        "mean1": 3402922.7333333334,
+        "mean2": 3393442.5,
+        "cv1": 2.405400059052185,
+        "cv2": 2.4081183120178,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.44893709979796736,
+        "p_val": 0.6551499986305638
+      }
+    },
+    {
+      "algorithm": "RSA-2048",
+      "operation": "encrypt",
+      "security_level": 2048,
+      "verdict": "PASS",
+      "mean_diff_pct": 0.0313,
+      "details": {
+        "mean1": 139743.96666666667,
+        "mean2": 139700.26666666666,
+        "cv1": 1.6400218620742095,
+        "cv2": 1.3102153876427265,
+        "n1": 30,
+        "n2": 30,
+        "t_stat": 0.08160618910429424,
+        "p_val": 0.9352545479175555
+      }
+    },
+    {
+      "algorithm": "RSA-2048",
+      "operation": "keygen",
+      "security_level": 2048,
+      "verdict": "FAIL",
+      "mean_diff_pct": 24.817,
+      "details": {
+        "mean1": 114372491.0,
+        "mean2": 85988634.0,
+        "cv1": 77.70183301713456,
+        "cv2": 58.5226741134142,
+        "n1": 5,
+        "n2": 5,
+        "t_stat": 0.621456150276292,
+        "p_val": 0.556019232892693
+      }
+    }
+  ]
+}

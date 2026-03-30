@@ -1,0 +1,9 @@
+# STACK ML-KEM keygen 512: 6248 bytes
+# STACK ML-KEM encaps 512: 8880 bytes
+# STACK ML-KEM decaps 512: 9656 bytes
+# STACK ML-KEM keygen 768: 10520 bytes
+# STACK ML-KEM encaps 768: 13480 bytes
+# STACK ML-KEM decaps 768: 14576 bytes
+# STACK ML-KEM keygen 1024: 15344 bytes
+# STACK ML-KEM encaps 1024: 18912 bytes
+# STACK ML-KEM decaps 1024: 20488 bytes

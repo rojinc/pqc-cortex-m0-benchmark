@@ -1,0 +1,9 @@
+# STACK ML-DSA keygen 44: 38584 bytes
+# STACK ML-DSA sign 44: 51840 bytes
+# STACK ML-DSA verify 44: 36072 bytes
+# STACK ML-DSA keygen 65: 55696 bytes
+# STACK ML-DSA sign 65: 55696 bytes
+# STACK ML-DSA verify 65: 55696 bytes
+# STACK ML-DSA keygen 87: 52880 bytes
+# STACK ML-DSA sign 87: 52880 bytes
+# STACK ML-DSA verify 87: 52880 bytes

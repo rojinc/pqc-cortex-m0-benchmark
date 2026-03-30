@@ -1,0 +1,32 @@
+# Build artifacts
+build/
+local_test/build/
+*.uf2
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.a
+*.d
+
+# IDE
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# External libraries (cloned separately, not tracked)
+pico-sdk/
+pqclean/
+mbedtls/
