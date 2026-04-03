@@ -1,6 +1,6 @@
 # PQC Benchmarks on ARM Cortex-M0+ (RP2040)
 
-> **Paper:** [Benchmarking Post-Quantum Cryptography on Resource-Constrained IoT Devices: ML-KEM and ML-DSA on ARM Cortex-M0+](https://arxiv.org/abs/2603.19340)
+> **Paper:** [Benchmarking NIST-Standardised ML-KEM and ML-DSA on ARM Cortex-M0+: Performance, Memory, and Energy on the RP2040](https://arxiv.org/abs/2603.19340)
 
 Systematic benchmarking of **NIST-standardized ML-KEM (FIPS 203)** and **ML-DSA (FIPS 204)** on ARM Cortex-M0+ (RP2040), with classical baselines (RSA-2048, ECDSA P-256, ECDH P-256).
 
