@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19393777.svg)](https://doi.org/10.5281/zenodo.19393777)
 # PQC Benchmarks on ARM Cortex-M0+ (RP2040)
 
 > **Paper:** [Benchmarking NIST-Standardised ML-KEM and ML-DSA on ARM Cortex-M0+: Performance, Memory, and Energy on the RP2040](https://arxiv.org/abs/2603.19340)
