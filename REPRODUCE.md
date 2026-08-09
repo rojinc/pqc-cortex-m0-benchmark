@@ -71,6 +71,28 @@ make -j"$(nproc)"
 > Building at `-Os` instead (`-DCMAKE_BUILD_TYPE=MinSizeRel`) is legitimate but
 > gives 4–16% higher latency — see `results/campaign_b/`.
 
+> **`-DNDEBUG` disables `assert()`, and nothing in this firmware uses it.**
+> Release mode adds `-DNDEBUG`, so it is worth stating what that does *not*
+> switch off here. Auditing every translation unit in the firmware link — our
+> `src/*.c` and `src/*.h`, plus the PQClean files named in `CMakeLists.txt`
+> (ML-KEM-512/768/1024 and ML-DSA-44/65/87 `clean/`, and `common/fips202.c`,
+> `common/sha2.c`, `common/sp800-185.c`) — finds zero occurrences of
+> `assert(`, `static_assert`, or `<assert.h>`. The only PQClean file at the
+> pinned commit that uses `assert()` is `common/randombytes.c`, which targets
+> desktop operating systems and is deliberately **not** compiled: it is
+> replaced by `src/randombytes_pico.c` (see the comment at `CMakeLists.txt`
+> line 38). No correctness check is therefore compiled out by `-DNDEBUG`.
+>
+> Algorithm correctness is established separately, before cross-compilation:
+> PQClean's KAT vectors are validated on the host, and the firmware itself
+> asserts nothing at runtime. Verify with:
+>
+> ```bash
+> grep -rn "assert" src/ pqclean/crypto_kem/*/clean/ \
+>   pqclean/crypto_sign/*/clean/ pqclean/common/fips202.c \
+>   pqclean/common/sha2.c pqclean/common/sp800-185.c
+> ```
+
 Windows (MinGW):
 
 ```bash
