@@ -3,7 +3,7 @@
 add_energy.py — Add energy_uj column to all benchmark CSV files.
 
 Energy is estimated from the RP2040 datasheet:
-  - Active current: ~24 mA at 3.3V, 133 MHz (single core executing)
+  - Active current: ~24 mA at 3.3V (single core executing)
   - Active power: 0.024 A × 3.3 V = 0.0792 W = 79.2 mW
   - Energy (µJ) = Power (W) × Time (µs) = 0.0792 × time_us
 
@@ -25,7 +25,7 @@ import pandas as pd
 
 # RP2040 power model (datasheet estimate)
 # RP2040 Datasheet, Section 5.4 — Typical current at DVDD + VREG_VIN
-# Active (133 MHz, single core): ~24 mA at 3.3V supply
+# Active (single core executing): ~24 mA at 3.3V supply
 VOLTAGE_V = 3.3
 ACTIVE_CURRENT_A = 0.024
 ACTIVE_POWER_W = VOLTAGE_V * ACTIVE_CURRENT_A  # 0.0792 W

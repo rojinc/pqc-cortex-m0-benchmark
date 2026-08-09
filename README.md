@@ -12,7 +12,12 @@ This repository provides benchmark firmware, reproducibility scripts, and proces
 **Rojin Chhetri** ([ORCID: 0009-0005-2757-3436](https://orcid.org/0009-0005-2757-3436))
 Independent Researcher
 
-## Key Results (RP2040 @ 133 MHz)
+## Key Results (RP2040 @ 125 MHz, `-O3`)
+
+> Measured at the pico-sdk default `clk_sys` of **125 MHz**. 133 MHz is the
+> RP2040 datasheet maximum, not this configuration. Wall-clock timings below are
+> measured directly; cycle counts quoted anywhere are *derived* (µs × 125).
+> Firmware is built at **`-O3`**, now pinned explicitly in `CMakeLists.txt`.
 
 ### ML-KEM timing (mean, µs)
 
@@ -42,6 +47,35 @@ Independent Researcher
 | ECDSA-P256 | verify | 321,359 |
 | ECDH-P256 | key agreement | 617,026 |
 
+## Independent Replication (Campaign B)
+
+`results/campaign_b/` holds an independent replication of the ML-KEM-512 and
+ML-DSA-44 measurements: **n=1000** per deterministic operation and **n=10,000**
+signatures, captured with a separately written harness at `-Os` for an unrelated
+multi-platform study. It was not run to support this paper, which is what makes
+it useful as a check.
+
+| | Campaign A (primary) | Campaign B (replication) |
+|---|---|---|
+| Signing samples | 100 | 10,000 |
+| Optimisation | `-O3` | `-Os` |
+| Harness | `src/bench_harness.h` | separate implementation |
+
+**What replicates:** every ordering and ratio the paper's conclusions rest on.
+**What shifts:** absolute latencies are 4–16% higher at `-Os`.
+
+**The signing tail was materially understated at n=100.** The 100-sample
+campaign put the p99 at 490 ms and never observed anything past 542 ms; at
+n=10,000 the p99 is 584 ms and the worst case is **1157 ms — 14.4× the fastest
+signature.** Any duty-cycle or watchdog budget for ML-DSA signing on this class
+of part should be set from the large-sample tail.
+
+Verify every published campaign-B number directly from the raw data:
+
+```bash
+python scripts/verify_campaign_b.py
+```
+
 ## Repository Layout
 
 ```text
@@ -55,7 +89,8 @@ Independent Researcher
 ├── src/                      # Firmware benchmark sources
 ├── scripts/                  # Data capture + analysis scripts
 ├── results/                  # Published benchmark data
-│   ├── raw/                  # Current benchmark CSVs + full logs
+│   ├── raw/                  # Campaign A: benchmark CSVs + full logs
+│   ├── campaign_b/           # Campaign B: independent replication (n=10,000 signing)
 │   └── old_data/             # Historical runs + environment metadata
 └── local_test/               # Host-local sanity tests without hardware
 ```

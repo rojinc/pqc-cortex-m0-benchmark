@@ -7,6 +7,21 @@ project(pqc_cortex_m0_benchmark C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 
+# Optimisation level is pinned explicitly rather than inherited.
+#
+# The published measurements were taken at -O3, which is what CMake's Release
+# build type supplies by default. Configuring without CMAKE_BUILD_TYPE would
+# otherwise give an unoptimised -O0 build and latencies several times larger
+# than the paper's, so the default is fixed here and the flag stated outright.
+# Set -DCMAKE_BUILD_TYPE=MinSizeRel to build at -Os instead; expect roughly
+# 4-16% higher latency, as quantified by the replication campaign in
+# results/campaign_b/.
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+set(CMAKE_C_FLAGS_RELEASE "-O3 -DNDEBUG" CACHE STRING "" FORCE)
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE} (C flags: ${CMAKE_C_FLAGS_${CMAKE_BUILD_TYPE}})")
+
 # Initialize the Pico SDK
 pico_sdk_init()
 

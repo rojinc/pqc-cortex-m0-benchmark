@@ -52,15 +52,30 @@ Linux/macOS:
 
 ```bash
 PICO_SDK_PATH=../pico-sdk cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_C_COMPILER=arm-none-eabi-gcc \
   -DCMAKE_CXX_COMPILER=arm-none-eabi-g++
 make -j"$(nproc)"
 ```
 
+> **Optimisation level matters.** The published numbers are `-O3`
+> (`CMAKE_BUILD_TYPE=Release`). `CMakeLists.txt` now defaults to `Release` and
+> prints the flags it used, so an omitted build type no longer silently produces
+> an `-O0` build with several-fold higher latencies. Confirm the configure step
+> prints:
+>
+> ```
+> -- Build type: Release (C flags: -O3 -DNDEBUG)
+> ```
+>
+> Building at `-Os` instead (`-DCMAKE_BUILD_TYPE=MinSizeRel`) is legitimate but
+> gives 4–16% higher latency — see `results/campaign_b/`.
+
 Windows (MinGW):
 
 ```bash
 PICO_SDK_PATH=../pico-sdk cmake .. -G "MinGW Makefiles" -DPICO_NO_PICOTOOL=1 \
+  -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_C_COMPILER=arm-none-eabi-gcc \
   -DCMAKE_CXX_COMPILER=arm-none-eabi-g++
 mingw32-make -j4
@@ -118,7 +133,26 @@ Outputs:
 - `results/my_run/*.csv` processed with energy estimates
 - comparison JSON reports in `results/`
 
+## 7) Verify the published replication numbers
+
+No hardware required — this recomputes every campaign-B value in the paper
+straight from the archived raw data and fails loudly on any mismatch:
+
+```bash
+python scripts/verify_campaign_b.py
+```
+
+It checks the replication table, the signing-tail quantiles, and the
+rejection-sampling lattice fit (iteration step *c*, early-abort quantum *f*, and
+the recovered iteration counts against the E[k]=4.25 predicted by FIPS 204).
+
 ## Notes on expected variability
 
 - Deterministic operations (e.g., ML-KEM encaps/decaps) should match closely across runs.
 - ML-DSA signing and RSA-2048 key generation are inherently variable and should be interpreted using distribution metrics (CV, p95, p99), not single-run values.
+- **Sample size drives the signing tail.** At n=100 the observed maximum sits
+  near the p99 and understates the true worst case by roughly 2×. The paper's
+  tail claims come from the n=10,000 campaign in `results/campaign_b/`; do not
+  size a watchdog or duty-cycle budget from a short run.
+- **Absolute latency is optimisation-dependent.** `-Os` firmware runs 4–16%
+  slower than the published `-O3` numbers. Compare like with like.

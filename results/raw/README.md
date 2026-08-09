@@ -1,7 +1,7 @@
 # Raw Benchmark Data
 
 These CSV files contain the raw benchmark measurements from the RP2040
-(ARM Cortex-M0+ at 133 MHz). Each file was captured via UART from a
+(ARM Cortex-M0+ at 125 MHz). Each file was captured via UART from a
 single authoritative measurement run.
 
 ## Files
