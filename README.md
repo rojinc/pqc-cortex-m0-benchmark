@@ -70,10 +70,13 @@ n=10,000 the p99 is 584 ms and the worst case is **1157 ms — 14.4× the fastes
 signature.** Any duty-cycle or watchdog budget for ML-DSA signing on this class
 of part should be set from the large-sample tail.
 
-Verify every published campaign-B number directly from the raw data:
+Verify every published number directly from the raw data. Both scripts exit
+non-zero on any mismatch:
 
 ```bash
-python scripts/verify_campaign_b.py
+python scripts/verify_campaign_b.py         # campaign-B tables and lattice fit
+python scripts/verify_revision.py --fast    # revision analyses, seconds
+python scripts/verify_revision.py           # adds the identifiability section (~18 min)
 ```
 
 ## Repository Layout

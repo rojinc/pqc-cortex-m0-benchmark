@@ -168,6 +168,37 @@ It checks the replication table, the signing-tail quantiles, and the
 rejection-sampling lattice fit (iteration step *c*, early-abort quantum *f*, and
 the recovered iteration counts against the E[k]=4.25 predicted by FIPS 204).
 
+## 8) Verify the revision analyses
+
+A second script covers the analyses added during peer review, again from
+archived data only:
+
+```bash
+python scripts/verify_revision.py          # full run, about 18 minutes
+python scripts/verify_revision.py --fast   # skips the slow section, seconds
+```
+
+It reproduces:
+
+1. The **negative identifiability result** of Section V-E. It shows that the
+   RMS objective alone does not determine the iteration step *c*, that the
+   modal-structure anchoring recovers the published n=10,000 fit
+   (c=28.91 ms, f=5.91 ms) without being told either value, and that the same
+   procedure applied to the n=100 samples returns bootstrap intervals for
+   E[k] too wide to support any cross-level claim. This section carries the
+   bootstrap and is what makes the full run slow; `--fast` skips it.
+2. The **corrected chi-squared test**, on the parameter estimated from the
+   sample rather than the FIPS-fixed one, alongside a reproduction of the
+   original construction whose rejection the paper retracts.
+3. The **synthetic control** refuting bin misassignment as an explanation for
+   that rejection, including the noise sweep.
+4. The **timer-quantisation bound** and the bootstrap cross-check on the
+   reported confidence intervals.
+5. The **Cortex-M4 comparison**, including the slowdown ratios and the pqm4
+   commit the reference cycle counts come from.
+
+Both scripts exit non-zero if any published number fails to reproduce.
+
 ## Notes on expected variability
 
 - Deterministic operations (e.g., ML-KEM encaps/decaps) should match closely across runs.
