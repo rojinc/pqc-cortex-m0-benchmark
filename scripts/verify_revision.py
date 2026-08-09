@@ -297,6 +297,7 @@ def main():
     rng = np.random.default_rng(SEED)
     q_sd_us = TIMER_RES_US / np.sqrt(12.0)   # uniform quantisation error
     worst_half, worst_q_share, worst_gap = 0.0, 0.0, 0.0
+    worst_cv, worst_case_t, worst_case_z = 0.0, 0.0, 0.0
     for (alg, op, lvl), g in a.groupby(["algorithm", "operation", "security_level"]):
         v = g.time_us.values.astype(float)
         if len(v) < 10:
@@ -305,6 +306,9 @@ def main():
         if cv > 1.5:            # signing is excluded: it is not a stable operation
             continue
         half_t = stats.t.ppf(0.975, len(v) - 1) * cv / np.sqrt(len(v))
+        half_z = 1.96 * cv / np.sqrt(len(v))
+        if cv > worst_cv:       # the worst case the paper quotes all three for
+            worst_cv, worst_case_t, worst_case_z = cv, half_t, half_z
         bs = np.array([rng.choice(v, len(v), replace=True).mean() for _ in range(N_BOOT_CI)])
         lo, hi = np.percentile(bs, [2.5, 97.5])
         half_b = 100 * max(hi - v.mean(), v.mean() - lo) / v.mean()
@@ -314,6 +318,13 @@ def main():
     check("worst-case CI half-width (%)", worst_half, PAPER_CI["worst_half_width_pct"], 0.011)
     check("quantisation as share of CV (%)", worst_q_share, PAPER_QUANT["max_pct_of_cv"], 0.05)
     check("analytic vs bootstrap gap (pts)", worst_gap, PAPER_CI["boot_agreement_pts"], 0.011)
+    # Section V-A prints all three intervals for the worst case so that the
+    # quoted 0.60% is attributable to a named method rather than ambiguous.
+    check("worst-case Student-t half-width (%)", worst_case_t, 0.55, 0.006)
+    check("worst-case normal half-width (%)", worst_case_z, 0.53, 0.006)
+    print(f"        worst case is CV={worst_cv:.2f}% at n=30; the paper quotes the "
+          f"widest of the three ({worst_half:.2f}%) because the samples are "
+          f"right-skewed.")
 
     # ---------------------------------------------------------------- [5]
     print("\n[5] pqm4 Cortex-M4 comparison (Table X)")
@@ -327,6 +338,35 @@ def main():
     print("        M4 reference cycles are pqm4 benchmarks.csv @ 90bfb630 (2025-05-22),")
     print("        clean/reference C at -O3, NUCLEO-L4R5ZI @ 24 MHz. The slowdown is a")
     print("        ratio of cycle counts and is independent of both clock rates.")
+
+    # ---------------------------------------------------------------- [6]
+    # Every millisecond/kilocycle pair in the paper must be internally
+    # consistent at the RP2040's actual 125 MHz core clock.  A stale figure
+    # computed at the 133 MHz datasheet maximum survived several drafts in
+    # the ECDH prose, so this section checks the conversion everywhere it
+    # appears rather than only where the error was found.
+    print("\n[6] Cycle-count conversions at the 125 MHz core clock")
+    # (ms, kilocycles) exactly as printed in Table VII and Section V-F.
+    paper_ms_kc = {
+        ("RSA-2048", "encrypt", 2048):        (139.7, 17460),
+        ("ECDSA-P256", "keygen", 256):        (83.6, 10455),
+        ("ECDSA-P256", "sign", 256):          (92.6, 11575),
+        ("ECDSA-P256", "verify", 256):        (321.4, 40170),
+        ("ECDH-P256", "key_agreement", 256):  (617.0, 77128),
+    }
+    for (alg, op, lvl), (ms_paper, kc_paper) in paper_ms_kc.items():
+        ms_meas = series(a, alg, op, lvl).mean()
+        check(f"{alg}-{lvl} {op} (ms)", ms_meas, ms_paper, 0.06)
+        check(f"{alg}-{lvl} {op} (kc)", ms_meas * RP2040_MHZ, kc_paper,
+              max(2.0, kc_paper * 1e-4))
+    ecdh_ms = series(a, "ECDH-P256", "key_agreement", 256).mean()
+    kem_ms = sum(series(a, "ML-KEM", op, 512).mean()
+                 for op in ("keygen", "encaps", "decaps"))
+    check("ECDH/ML-KEM-512 handshake speedup", ecdh_ms / kem_ms, 17.0, 0.5)
+    print(f"        ECDH at the 133 MHz datasheet maximum would be "
+          f"{ecdh_ms * 133:.0f} kc, which is the stale value the revision "
+          f"removed;\n        the paper reports "
+          f"{ecdh_ms * RP2040_MHZ:.0f} kc at the actual 125 MHz clock.")
 
     print()
     if failures:

@@ -192,10 +192,16 @@ It reproduces:
    original construction whose rejection the paper retracts.
 3. The **synthetic control** refuting bin misassignment as an explanation for
    that rejection, including the noise sweep.
-4. The **timer-quantisation bound** and the bootstrap cross-check on the
-   reported confidence intervals.
+4. The **timer-quantisation bound** and all three confidence intervals for the
+   worst case (bootstrap, Student-*t*, normal), so the 0.60% figure the paper
+   quotes is attributable to a named method rather than ambiguous.
 5. The **Cortex-M4 comparison**, including the slowdown ratios and the pqm4
    commit the reference cycle counts come from.
+6. Every **millisecond/kilocycle pair** in the paper, checked against the
+   RP2040's actual 125 MHz core clock. A figure computed at the 133 MHz
+   datasheet maximum once survived into the ECDH prose, so this section
+   checks the conversion everywhere it appears rather than only where the
+   error was found.
 
 Both scripts exit non-zero if any published number fails to reproduce.
 
