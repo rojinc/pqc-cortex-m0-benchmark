@@ -190,7 +190,17 @@ It reproduces:
 2. The **corrected chi-squared test**, on the parameter estimated from the
    sample rather than the FIPS-fixed one, alongside a reproduction of the
    original construction whose rejection the paper retracts.
-3. The **synthetic control** refuting bin misassignment as an explanation for
+3. The **robustness and power analysis** backing that non-rejection, since a
+   non-rejection is weak evidence on its own: the minimum expected bin count
+   (59, well clear of the usual expected-count-under-5 concern), an exact
+   parametric-bootstrap p-value that uses no asymptotic approximation
+   (p=0.070 against the asymptotic 0.066), a Kolmogorov-Smirnov check
+   calibrated the same way (p=0.51), and a power curve against a
+   beta-geometric alternative. The last one is the useful number: the test
+   reaches 80% power at beta=0.988, so this campaign rules out departures
+   that would inflate E[k] by more than about 4.4%, and cannot rule out
+   smaller ones.
+4. The **synthetic control** refuting bin misassignment as an explanation for
    that rejection, including the noise sweep.
 4. The **timer-quantisation bound** and all three confidence intervals for the
    worst case (bootstrap, Student-*t*, normal), so the 0.60% figure the paper

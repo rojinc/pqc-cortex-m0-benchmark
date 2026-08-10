@@ -43,6 +43,9 @@ SKIP_SLOW = "--fast" in sys.argv
 SEED = 0
 N_BOOT = 150          # bootstrap resamples for the E[k] intervals in Sec. V-E
 N_BOOT_CI = 4000      # bootstrap resamples for the timing-CI cross-check
+NBINS = 15            # k = 1..15 individually, plus a tail bin: 16 bins, 14 d.o.f.
+N_BOOT_EXACT = 20000  # resamples for the exact (parametric-bootstrap) p-value
+KMAX = 400            # support truncation for the beta-geometric alternative
 RP2040_MHZ = 125.0
 TIMER_RES_US = 1.0    # RP2040 time_us_32() quantum
 
@@ -92,12 +95,59 @@ def chi2_geometric(k, p, kmax=15):
     spent because p is estimated from the same sample. Callers testing against
     an externally fixed p should add that degree of freedom back.
     """
+    if p is None:               # estimate from the sample, as the null requires
+        p = 1.0 / k.mean()
     obs = np.array([(k == i).sum() for i in range(1, kmax + 1)] + [(k > kmax).sum()])
     pr = np.array([p * (1 - p) ** (i - 1) for i in range(1, kmax + 1)])
     pr = np.append(pr, max(1.0 - pr.sum(), 1e-12))
     exp = pr * len(k)
     stat = float(((obs - exp) ** 2 / exp).sum())
-    return stat, len(obs) - 1 - 1
+    return stat, len(obs) - 1 - 1, float(exp.min())
+
+
+def ks_stat(k, p):
+    """One-sample KS distance against a geometric CDF, for discrete support."""
+    x = np.sort(k)
+    cdf = 1.0 - (1.0 - p) ** x
+    emp = np.arange(1, len(x) + 1) / len(x)
+    return float(max(np.abs(emp - cdf).max(), np.abs(cdf - (emp - 1.0 / len(x))).max()))
+
+
+def beta_geom_pmf(p0, beta, kmax):
+    """Beta-geometric: acceptance probability drifts by a factor beta per attempt.
+
+    beta = 1 recovers the geometric null; beta < 1 makes late attempts
+    progressively less likely to succeed, inflating E[k].
+    """
+    j = np.arange(kmax)
+    pj = np.minimum(p0 * beta ** j, 1.0)
+    surv = np.concatenate(([1.0], np.cumprod(1.0 - pj)[:-1]))
+    pmf = surv * pj
+    return pmf / pmf.sum()
+
+
+def _power_at(rng, p0, beta, n, crit, support, nsim=1500):
+    S = rng.choice(support, size=(nsim, n), p=beta_geom_pmf(p0, beta, len(support)))
+    ph = 1.0 / S.mean(1)
+    nb = NBINS + 1              # k = 1..NBINS individually, plus one tail bin
+    O = np.stack([(S == i + 1).sum(1) if i < nb - 1 else (S > NBINS).sum(1)
+                  for i in range(nb)], 1)
+    j = np.arange(nb - 1)
+    Q = ph[:, None] * (1 - ph[:, None]) ** j[None, :]
+    Q = np.concatenate([Q, 1 - Q.sum(1, keepdims=True)], 1)
+    E = Q * n
+    return float((((O - E) ** 2 / E).sum(1) >= crit).mean())
+
+
+def bisect_power(rng, p0, n, crit, support, target=0.80, lo=0.980, hi=0.995):
+    """Smallest departure (largest beta) the test detects with `target` power."""
+    for _ in range(9):
+        mid = (lo + hi) / 2
+        if _power_at(rng, p0, mid, n, crit, support) < target:
+            hi = mid
+        else:
+            lo = mid
+    return (lo + hi) / 2
 
 
 def best_f(v, c, r_lo=0.13, r_hi=0.30, step=0.01):
@@ -247,7 +297,7 @@ def main():
     c44, f44 = PAPER_10K_FIT["c"], PAPER_10K_FIT["f"]
     k10k = recover_iterations(v10k, c44, f44, v10k.min())
     p_est = 1.0 / k10k.mean()
-    stat_est, dof_est = chi2_geometric(k10k, p_est)
+    stat_est, dof_est, _ = chi2_geometric(k10k, p_est)
     p_val = 1 - stats.chi2.cdf(stat_est, dof_est)
     check("chi2 with estimated p", stat_est, PAPER_CHI2["stat"], 0.05)
     check("degrees of freedom", dof_est, PAPER_CHI2["dof"], 0)
@@ -258,10 +308,48 @@ def main():
         failures.append("corrected test still rejects")
 
     # The original construction, which produced the p=0.010 the paper retracts.
-    stat_fips, dof_fips = chi2_geometric(k10k, 1.0 / FIPS_EK[44])
+    stat_fips, dof_fips, _ = chi2_geometric(k10k, 1.0 / FIPS_EK[44])
     p_fips = 1 - stats.chi2.cdf(stat_fips, dof_fips + 1)
     print(f"        (original FIPS-fixed construction reproduces as "
           f"chi2={stat_fips:.2f}, p={p_fips:.3f} -- the rejection the paper retracts)")
+
+    # ---------------------------------------------------------------- [2b]
+    # A non-rejection is weak on its own, so Section V-D backs it with an
+    # exact (parametric-bootstrap) p-value, a calibrated KS check, and a
+    # power analysis against a beta-geometric alternative.
+    if SKIP_SLOW:
+        print("\n[2b] Robustness and power for the geometric fit"
+              "\n        (skipped: --fast; the power curve takes ~1 min)")
+    else:
+        print("\n[2b] Robustness and power for the geometric fit")
+        kk = k10k.astype(int)
+        n_k = len(kk)
+        phat = 1.0 / kk.mean()
+        rng2 = np.random.default_rng(SEED)
+
+        obs_chi2, _, min_exp = chi2_geometric(kk, phat, NBINS)
+        check("minimum expected bin count", min_exp, 59.0, 1.0)
+
+        null = np.array([chi2_geometric(rng2.geometric(phat, n_k), None, NBINS)[0]
+                         for _ in range(N_BOOT_EXACT)])
+        check("parametric-bootstrap p-value", (null >= obs_chi2).mean(), 0.069, 0.010)
+
+        ks_obs = ks_stat(kk, phat)
+        ks_null = np.array([ks_stat(s, 1.0 / s.mean())
+                            for s in (rng2.geometric(phat, n_k) for _ in range(2000))])
+        check("calibrated KS p-value", (ks_null >= ks_obs).mean(), 0.50, 0.06)
+
+        # Power: beta-geometric alternative, acceptance probability drifting
+        # by a factor beta per attempt. beta=1 is the geometric null.
+        crit = np.percentile(null, 95)
+        support = np.arange(1, KMAX + 1)
+        b80 = bisect_power(rng2, phat, n_k, crit, support, target=0.80)
+        ek80 = float((support * beta_geom_pmf(phat, b80, KMAX)).sum())
+        check("beta at 80% power", b80, 0.988, 0.004)
+        check("E[k] inflation detectable at 80% power (%)",
+              100 * (ek80 / kk.mean() - 1), 4.4, 0.3)
+        print(f"        the test rules out departures inflating E[k] by more than "
+              f"~{100 * (ek80 / kk.mean() - 1):.1f}%, and cannot rule out smaller ones")
 
     # ---------------------------------------------------------------- [3]
     print("\n[3] Synthetic control for the bin-misassignment explanation")
