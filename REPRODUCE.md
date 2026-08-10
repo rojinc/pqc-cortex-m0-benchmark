@@ -180,13 +180,15 @@ python scripts/verify_revision.py --fast   # skips the slow section, seconds
 
 It reproduces:
 
-1. The **negative identifiability result** of Section V-E. It shows that the
+1. The **cross-level limits** of the iteration recovery. It shows that the
    RMS objective alone does not determine the iteration step *c*, that the
    modal-structure anchoring recovers the published n=10,000 fit
    (c=28.91 ms, f=5.91 ms) without being told either value, and that the same
    procedure applied to the n=100 samples returns bootstrap intervals for
    E[k] too wide to support any cross-level claim. This section carries the
    bootstrap and is what makes the full run slow; `--fast` skips it.
+   The degeneracy of the objective and the criterion that resolves it are
+   treated separately, in step 9 below.
 2. The **corrected chi-squared test**, on the parameter estimated from the
    sample rather than the FIPS-fixed one, alongside a reproduction of the
    original construction whose rejection the paper retracts.
@@ -214,6 +216,56 @@ It reproduces:
    error was found.
 
 Both scripts exit non-zero if any published number fails to reproduce.
+
+## 9) Verify identifiability and the instrumented ground truth
+
+The iteration-recovery method of Section V rests on a least-squares fit that
+is *degenerate*: finer candidate lattices always fit better, so the residual
+minimiser is not the answer. This script demonstrates the degeneracy, applies
+the geometric-distribution criterion that resolves it, and validates the
+result against an instrumented rejection counter:
+
+```bash
+python scripts/verify_identifiability.py    # a few minutes, seeded
+```
+
+It reproduces, in order:
+
+1. The **degenerate minimum** on the n=10,000 ML-DSA-44 sample
+   (c=5.1 ms, E[k]=20.7, RMS 0.069 ms) — a *better* residual than the
+   published fit, and roughly five times the FIPS-204 iteration count. This
+   is the wrong answer the objective prefers.
+2. The **selected fundamental** under the geometric criterion from a wide
+   uninformed grid: c=28.8 ms, E[k]=4.34, chi-squared p=0.115, with no
+   admissible candidate below 28 ms — recovering the windowed fit's step
+   without being given the window.
+3. **Bootstrap intervals** over signatures: E[k] in [4.28, 4.37] at 90%,
+   with c inside 28.5-29.8 ms in every resample.
+4. The **instrumented ground truth** from `results/local_x86_10k/`: true
+   E[k] of 4.386, 5.181 and 3.939 at levels 44/65/87, each within 3.2% of
+   the FIPS-204 value, and the linearity of latency in the true iteration
+   count (R2 = 0.994-0.999 on per-k medians over counts observed at least
+   20 times; the per-sample R2 is far lower because host jitter is large
+   relative to one iteration).
+5. The **reliability regime**: mean |E[k]| error against jitter expressed as
+   a fraction of one iteration step, locating where the method stops working.
+   The RP2040 sits at 0.73% of a step (inside the regime) and the x86 host at
+   487% (far outside). Applied blind to the host data the method **abstains**
+   at levels 44 and 65 rather than guessing.
+
+The instrumented dataset and the PQClean patches that produced it are in
+`results/local_x86_10k/`:
+
+| File | Contents |
+|---|---|
+| `mldsa_rejection_10k_x86.csv` | 10,000 signatures per level with the true rejection-loop iteration count recorded alongside each timing |
+| `pqclean_rejection_counter.patch` | adds the iteration counter to PQClean `sign.c` for ML-DSA-44/65/87 |
+| `bench_mldsa_iters.patch` | harness changes that emit the counter with each timing |
+| `harness_portable.patch` | portability shims for building the harness on an x86 host |
+
+This is host-side x86 data and is **not** a substitute for on-device
+measurement; it exists to supply ground-truth iteration counts, which the
+RP2040 firmware does not report.
 
 ## Notes on expected variability
 

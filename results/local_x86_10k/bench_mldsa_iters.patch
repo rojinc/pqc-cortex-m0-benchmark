@@ -1,0 +1,54 @@
+--- /sessions/magical-intelligent-pasteur/mnt/research/pqc-cortex-m0-benchmark-priv/local_test/bench_mldsa_local.c	2026-07-14 18:39:02.911347241 +0930
++++ local_test/bench_mldsa_local.c	2026-07-16 19:20:43.950000129 +0930
+@@ -13,6 +13,12 @@
+ #include "ml-dsa-65/clean/api.h"
+ #include "ml-dsa-87/clean/api.h"
+ 
++/* rejection-loop counters exported by instrumented PQClean sign.c */
++extern uint32_t mldsa44_rej_iterations;
++extern uint32_t mldsa65_rej_iterations;
++extern uint32_t mldsa87_rej_iterations;
++static uint32_t _rej_before;
++
+ static const uint8_t test_message[] =
+     "This is a test message for ML-DSA benchmarking on ARM Cortex-M0+. "
+     "The Raspberry Pi Pico RP2040 has 264KB RAM and runs at 133MHz.";
+@@ -42,9 +48,12 @@
+     PQCLEAN_MLDSA44_CLEAN_crypto_sign_keypair(pk, sk);
+ 
+     BENCH_RUN("ML-DSA", "sign", 44, NUM_RUNS_DSA_SIGN, {
++        _rej_before = mldsa44_rej_iterations;
+         rc = PQCLEAN_MLDSA44_CLEAN_crypto_sign_signature(sig, &sig_len,
+                 test_message, test_message_len, sk);
+         if (rc != 0) printf("# ERROR: sign failed rc=%d\n", rc);
++        printf("ML-DSA,sign_iters,44,%u,%d\n",
++               (unsigned)(mldsa44_rej_iterations - _rej_before), _i + 1);
+     });
+ 
+     PQCLEAN_MLDSA44_CLEAN_crypto_sign_signature(sig, &sig_len,
+@@ -89,9 +98,12 @@
+     PQCLEAN_MLDSA65_CLEAN_crypto_sign_keypair(pk, sk);
+ 
+     BENCH_RUN("ML-DSA", "sign", 65, NUM_RUNS_DSA_SIGN, {
++        _rej_before = mldsa65_rej_iterations;
+         rc = PQCLEAN_MLDSA65_CLEAN_crypto_sign_signature(sig, &sig_len,
+                 test_message, test_message_len, sk);
+         if (rc != 0) printf("# ERROR: sign failed rc=%d\n", rc);
++        printf("ML-DSA,sign_iters,65,%u,%d\n",
++               (unsigned)(mldsa65_rej_iterations - _rej_before), _i + 1);
+     });
+ 
+     PQCLEAN_MLDSA65_CLEAN_crypto_sign_signature(sig, &sig_len,
+@@ -136,9 +148,12 @@
+     PQCLEAN_MLDSA87_CLEAN_crypto_sign_keypair(pk, sk);
+ 
+     BENCH_RUN("ML-DSA", "sign", 87, NUM_RUNS_DSA_SIGN, {
++        _rej_before = mldsa87_rej_iterations;
+         rc = PQCLEAN_MLDSA87_CLEAN_crypto_sign_signature(sig, &sig_len,
+                 test_message, test_message_len, sk);
+         if (rc != 0) printf("# ERROR: sign failed rc=%d\n", rc);
++        printf("ML-DSA,sign_iters,87,%u,%d\n",
++               (unsigned)(mldsa87_rej_iterations - _rej_before), _i + 1);
+     });
+ 
+     PQCLEAN_MLDSA87_CLEAN_crypto_sign_signature(sig, &sig_len,

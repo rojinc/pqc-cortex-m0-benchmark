@@ -1,0 +1,43 @@
+--- /sessions/magical-intelligent-pasteur/mnt/research/pqc-cortex-m0-benchmark-priv/local_test/bench_harness_local.h	2026-07-14 18:39:02.911190991 +0930
++++ local_test/bench_harness_local.h	2026-07-16 19:22:39.210000184 +0930
+@@ -15,11 +15,19 @@
+ #include <stdint.h>
+ #include <string.h>
+ #include <math.h>
++
++#ifdef _WIN32
+ #include <windows.h>
++#else
++#include <time.h>
++#endif
+ 
+ #define NUM_RUNS          30
++#ifndef NUM_RUNS_DSA_SIGN
+ #define NUM_RUNS_DSA_SIGN 100
++#endif
+ 
++#ifdef _WIN32
+ static LARGE_INTEGER _bench_freq;
+ 
+ static inline void bench_init(void) {
+@@ -36,6 +44,20 @@
+     QueryPerformanceCounter(&t);
+     return (uint64_t)(t.QuadPart * 1000000ULL / _bench_freq.QuadPart);
+ }
++#else
++static inline void bench_init(void) {
++    printf("# PQC Benchmark Suite (Local PC)\n");
++    printf("# Using PQClean reference C implementations\n");
++    printf("# Timer: clock_gettime(CLOCK_MONOTONIC)\n");
++    printf("#\n");
++}
++
++static inline uint64_t bench_time_us(void) {
++    struct timespec t;
++    clock_gettime(CLOCK_MONOTONIC, &t);
++    return (uint64_t)t.tv_sec * 1000000ULL + (uint64_t)t.tv_nsec / 1000ULL;
++}
++#endif
+ 
+ static inline void bench_csv_header(void) {
+     printf("algorithm,operation,security_level,time_us,run_number\n");

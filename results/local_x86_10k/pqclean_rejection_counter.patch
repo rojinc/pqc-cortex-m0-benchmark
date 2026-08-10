@@ -1,0 +1,66 @@
+diff --git a/crypto_sign/ml-dsa-44/clean/sign.c b/crypto_sign/ml-dsa-44/clean/sign.c
+index b8e4e22e..8626c60a 100644
+--- a/crypto_sign/ml-dsa-44/clean/sign.c
++++ b/crypto_sign/ml-dsa-44/clean/sign.c
+@@ -20,6 +20,9 @@
+ *
+ * Returns 0 (success)
+ **************************************************/
++
++/* === BENCHMARK INSTRUMENTATION: rejection-loop counter (task #5) === */
++uint32_t mldsa44_rej_iterations = 0;
+ int PQCLEAN_MLDSA44_CLEAN_crypto_sign_keypair(uint8_t *pk, uint8_t *sk) {
+     uint8_t seedbuf[2 * SEEDBYTES + CRHBYTES];
+     uint8_t tr[TRBYTES];
+@@ -131,6 +134,7 @@ int PQCLEAN_MLDSA44_CLEAN_crypto_sign_signature_ctx(uint8_t *sig,
+     PQCLEAN_MLDSA44_CLEAN_polyveck_ntt(&t0);
+ 
+ rej:
++    mldsa44_rej_iterations++;
+     /* Sample intermediate vector y */
+     PQCLEAN_MLDSA44_CLEAN_polyvecl_uniform_gamma1(&y, rhoprime, nonce++);
+ 
+diff --git a/crypto_sign/ml-dsa-65/clean/sign.c b/crypto_sign/ml-dsa-65/clean/sign.c
+index cf85a9e3..8bae113d 100644
+--- a/crypto_sign/ml-dsa-65/clean/sign.c
++++ b/crypto_sign/ml-dsa-65/clean/sign.c
+@@ -20,6 +20,9 @@
+ *
+ * Returns 0 (success)
+ **************************************************/
++
++/* === BENCHMARK INSTRUMENTATION: rejection-loop counter (task #5) === */
++uint32_t mldsa65_rej_iterations = 0;
+ int PQCLEAN_MLDSA65_CLEAN_crypto_sign_keypair(uint8_t *pk, uint8_t *sk) {
+     uint8_t seedbuf[2 * SEEDBYTES + CRHBYTES];
+     uint8_t tr[TRBYTES];
+@@ -131,6 +134,7 @@ int PQCLEAN_MLDSA65_CLEAN_crypto_sign_signature_ctx(uint8_t *sig,
+     PQCLEAN_MLDSA65_CLEAN_polyveck_ntt(&t0);
+ 
+ rej:
++    mldsa65_rej_iterations++;
+     /* Sample intermediate vector y */
+     PQCLEAN_MLDSA65_CLEAN_polyvecl_uniform_gamma1(&y, rhoprime, nonce++);
+ 
+diff --git a/crypto_sign/ml-dsa-87/clean/sign.c b/crypto_sign/ml-dsa-87/clean/sign.c
+index 2637de3d..63001860 100644
+--- a/crypto_sign/ml-dsa-87/clean/sign.c
++++ b/crypto_sign/ml-dsa-87/clean/sign.c
+@@ -20,6 +20,9 @@
+ *
+ * Returns 0 (success)
+ **************************************************/
++
++/* === BENCHMARK INSTRUMENTATION: rejection-loop counter (task #5) === */
++uint32_t mldsa87_rej_iterations = 0;
+ int PQCLEAN_MLDSA87_CLEAN_crypto_sign_keypair(uint8_t *pk, uint8_t *sk) {
+     uint8_t seedbuf[2 * SEEDBYTES + CRHBYTES];
+     uint8_t tr[TRBYTES];
+@@ -131,6 +134,7 @@ int PQCLEAN_MLDSA87_CLEAN_crypto_sign_signature_ctx(uint8_t *sig,
+     PQCLEAN_MLDSA87_CLEAN_polyveck_ntt(&t0);
+ 
+ rej:
++    mldsa87_rej_iterations++;
+     /* Sample intermediate vector y */
+     PQCLEAN_MLDSA87_CLEAN_polyvecl_uniform_gamma1(&y, rhoprime, nonce++);
+ 
