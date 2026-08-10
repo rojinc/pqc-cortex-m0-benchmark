@@ -1,0 +1,33 @@
+{
+  "campaign": "C",
+  "board": 1,
+  "firmware": "mlkem",
+  "started_utc": "2026-08-10T07:58:45.162004+00:00",
+  "sample_counts": {
+    "deterministic": 1000,
+    "sign": 1000,
+    "rsa_decrypt": 100,
+    "rsa_keygen": 3,
+    "rng": 2000
+  },
+  "board_unique_id": "E663AC91D321B038",
+  "clk_sys_hz": 125000000,
+  "firmware_build": "Aug 10 2026 17:23:03 | gcc 15.2.1 20251203",
+  "summaries": [
+    "SUMMARY ML-KEM keygen 512: mean=9693 min=9658 max=10460 stddev=52.4 cv=0.54% (n=1000)",
+    "SUMMARY ML-KEM encaps 512: mean=11301 min=11271 max=11374 stddev=9.5 cv=0.08% (n=1000)",
+    "SUMMARY ML-KEM decaps 512: mean=13964 min=13876 max=14010 stddev=11.8 cv=0.08% (n=1000)",
+    "SUMMARY ML-KEM keygen 768: mean=15764 min=15723 max=16206 stddev=60.0 cv=0.38% (n=1000)",
+    "SUMMARY ML-KEM encaps 768: mean=18283 min=18205 max=18314 stddev=9.8 cv=0.05% (n=1000)",
+    "SUMMARY ML-KEM decaps 768: mean=21703 min=21604 max=21750 stddev=11.9 cv=0.05% (n=1000)",
+    "SUMMARY ML-KEM keygen 1024: mean=24648 min=24585 max=25081 stddev=82.6 cv=0.34% (n=1000)",
+    "SUMMARY ML-KEM encaps 1024: mean=27673 min=27644 max=27702 stddev=9.0 cv=0.03% (n=1000)",
+    "SUMMARY ML-KEM decaps 1024: mean=31980 min=31930 max=32025 stddev=9.9 cv=0.03% (n=1000)"
+  ],
+  "finished_utc": "2026-08-10T08:03:15.167411+00:00",
+  "elapsed_s": 270.0,
+  "rows_captured": 9000,
+  "rows_expected": 9000,
+  "completed_marker_seen": true,
+  "shortfalls": []
+}

@@ -1,0 +1,21 @@
+{
+  "board1_unique_id": "E663AC91D321B038",
+  "board2_unique_id": "E66368254F75782F",
+  "clk_sys_board1_hz": 125000000,
+  "clk_sys_board2_hz": 125000000,
+  "equivalence_margin_pct": 1.0,
+  "n_operations": 28,
+  "n_informative": 25,
+  "n_equivalent": 23,
+  "n_different": 0,
+  "n_inconclusive": 2,
+  "inconclusive_operations": [
+    "RSA-2048 keygen 2048",
+    "randombytes generate 1"
+  ],
+  "different_operations": [],
+  "all_powered_equivalent": true,
+  "max_abs_diff_pct_equivalent": 0.2998761329343962,
+  "max_abs_diff_operation": "ECDSA-P256 verify 256",
+  "widest_ci_pct_equivalent": 0.3148875301519994
+}

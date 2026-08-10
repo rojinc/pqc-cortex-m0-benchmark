@@ -1,0 +1,33 @@
+{
+  "campaign": "C",
+  "board": 2,
+  "firmware": "mldsa",
+  "started_utc": "2026-08-10T09:36:49.791286+00:00",
+  "sample_counts": {
+    "deterministic": 1000,
+    "sign": 1000,
+    "rsa_decrypt": 100,
+    "rsa_keygen": 3,
+    "rng": 2000
+  },
+  "board_unique_id": "E66368254F75782F",
+  "clk_sys_hz": 125000000,
+  "firmware_build": "Aug 10 2026 17:23:05 | gcc 15.2.1 20251203",
+  "summaries": [
+    "SUMMARY ML-DSA keygen 44: mean=38939 min=37889 max=39964 stddev=350.3 cv=0.90% (n=1000)",
+    "SUMMARY ML-DSA sign 44: mean=158126 min=68748 max=662780 stddev=98066.9 cv=62.02% (n=1000)",
+    "SUMMARY ML-DSA verify 44: mean=43123 min=42957 max=43184 stddev=12.1 cv=0.03% (n=1000)",
+    "SUMMARY ML-DSA keygen 65: mean=66924 min=66893 max=67342 stddev=16.8 cv=0.03% (n=1000)",
+    "SUMMARY ML-DSA sign 65: mean=269083 min=105436 max=1266245 stddev=176744.8 cv=65.68% (n=1000)",
+    "SUMMARY ML-DSA verify 65: mean=70781 min=70731 max=70850 stddev=10.1 cv=0.01% (n=1000)",
+    "SUMMARY ML-DSA keygen 87: mean=111802 min=110583 max=112998 stddev=443.0 cv=0.40% (n=1000)",
+    "SUMMARY ML-DSA sign 87: mean=319334 min=165269 max=1447286 stddev=181408.1 cv=56.81% (n=1000)",
+    "SUMMARY ML-DSA verify 87: mean=117838 min=117746 max=117895 stddev=10.0 cv=0.01% (n=1000)"
+  ],
+  "finished_utc": "2026-08-10T09:58:25.297373+00:00",
+  "elapsed_s": 1295.5,
+  "rows_captured": 9000,
+  "rows_expected": 9000,
+  "completed_marker_seen": true,
+  "shortfalls": []
+}

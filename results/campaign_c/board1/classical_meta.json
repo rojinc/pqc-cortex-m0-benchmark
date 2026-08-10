@@ -1,0 +1,31 @@
+{
+  "campaign": "C",
+  "board": 1,
+  "firmware": "classical",
+  "started_utc": "2026-08-10T08:36:42.236796+00:00",
+  "sample_counts": {
+    "deterministic": 1000,
+    "sign": 1000,
+    "rsa_decrypt": 100,
+    "rsa_keygen": 3,
+    "rng": 2000
+  },
+  "board_unique_id": "E663AC91D321B038",
+  "clk_sys_hz": 125000000,
+  "firmware_build": "Aug 10 2026 17:22:58 | gcc 15.2.1 20251203",
+  "summaries": [
+    "SUMMARY RSA-2048 keygen 2048: mean=74221044 min=51031001 max=113141782 (n=3)",
+    "SUMMARY RSA-2048 encrypt 2048: mean=134863 min=134774 max=143836 stddev=324.5 cv=0.24% (n=1000)",
+    "SUMMARY RSA-2048 decrypt 2048: mean=3282781 min=3277743 max=3711164 stddev=43055.0 cv=1.31% (n=100)",
+    "SUMMARY ECDSA-P256 keygen 256: mean=85135 min=84162 max=86090 stddev=349.5 cv=0.41% (n=1000)",
+    "SUMMARY ECDSA-P256 sign 256: mean=94168 min=93152 max=95361 stddev=394.4 cv=0.42% (n=1000)",
+    "SUMMARY ECDSA-P256 verify 256: mean=321604 min=321118 max=321992 stddev=113.8 cv=0.04% (n=1000)",
+    "SUMMARY ECDH-P256 key_agreement 256: mean=620491 min=617166 max=623734 stddev=1004.2 cv=0.16% (n=1000)"
+  ],
+  "finished_utc": "2026-08-10T09:08:43.601713+00:00",
+  "elapsed_s": 1921.4,
+  "rows_captured": 5103,
+  "rows_expected": 5103,
+  "completed_marker_seen": true,
+  "shortfalls": []
+}
