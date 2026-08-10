@@ -225,3 +225,10 @@ Both scripts exit non-zero if any published number fails to reproduce.
   size a watchdog or duty-cycle budget from a short run.
 - **Absolute latency is optimisation-dependent.** `-Os` firmware runs 4–16%
   slower than the published `-O3` numbers. Compare like with like.
+- **A different board is not a source of disagreement; a different build is.**
+  Campaign C (`results/campaign_c/`) measured two physical RP2040 units under
+  one firmware image and found all 23 adequately powered operations equivalent
+  within ±1%, PQC operations agreeing to 0.075%. The optimisation-level effect
+  above is ~26× larger. If your numbers differ from the published ones by more
+  than ~0.1% on a deterministic PQC operation, check the build before suspecting
+  the hardware.

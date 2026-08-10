@@ -70,6 +70,43 @@ n=10,000 the p99 is 584 ms and the worst case is **1157 ms — 14.4× the fastes
 signature.** Any duty-cycle or watchdog budget for ML-DSA signing on this class
 of part should be set from the large-sample tail.
 
+## Inter-Unit Agreement (Campaign C)
+
+Campaigns A and B both ran on one physical RP2040, so they bound *build*
+sensitivity but say nothing about manufacturing spread. `results/campaign_c/`
+holds a two-device comparison under one firmware build: 28 operations across
+ML-KEM, ML-DSA, RSA-2048, ECDSA/ECDH-P256 and the on-chip RNG, 58,206 timed runs
+across both units.
+
+Equivalence was tested with TOST against a **pre-declared ±1% margin** — a
+non-significant difference is not evidence of agreement, so the interval has to
+fall inside the margin rather than merely cover zero.
+
+| | result |
+|---|---|
+| Adequately powered operations | 23 of 28 |
+| **Equivalent within ±1%** | **23 (all of them)** |
+| Different | 0 |
+| Largest difference observed | 0.300% (ECDSA-P256 verify) |
+| Largest among the 15 PQC operations | 0.075% (ML-DSA-44 keygen) |
+| Inconclusive (low n by design) | 2 — reported as untested, not as agreement |
+
+**Build configuration matters ~26× more than which board you use.** Across the
+15 deterministic PQC operations common to campaigns A and C, changing
+optimisation level and SDK version moves mean latency by 1.4–2.5%; changing the
+physical die moves it by at most 0.075%. Always report the build alongside an
+absolute figure.
+
+Two operations report `inconclusive` rather than agreement. RSA-2048 keygen runs
+at n=3 by design (~3 min each): with 3-vs-3 samples a permutation test has a
+*minimum attainable* p of 0.100, so no difference can reach significance however
+the data fall. Single-byte RNG generation is quantised to the 1 µs timer at a
+mean of 1 µs, so its interval reflects timer resolution, not hardware.
+
+```bash
+python scripts/compare_boards.py            # TOST equivalence across both units
+```
+
 Verify every published number directly from the raw data. Both scripts exit
 non-zero on any mismatch:
 
@@ -94,6 +131,7 @@ python scripts/verify_revision.py           # adds the identifiability section (
 ├── results/                  # Published benchmark data
 │   ├── raw/                  # Campaign A: benchmark CSVs + full logs
 │   ├── campaign_b/           # Campaign B: independent replication (n=10,000 signing)
+│   ├── campaign_c/           # Campaign C: two-device inter-unit comparison
 │   └── old_data/             # Historical runs + environment metadata
 └── local_test/               # Host-local sanity tests without hardware
 ```
