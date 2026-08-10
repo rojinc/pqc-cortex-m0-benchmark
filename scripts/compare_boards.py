@@ -108,7 +108,23 @@ def load_board(root, board):
     return df, ids.pop(), (clks.pop() if len(clks) == 1 else None)
 
 
-def welch(x, y):
+def tost_p(diff_pct, se_pct, dof, margin):
+    """p-value for two one-sided tests of equivalence within +/-margin.
+
+    Equivalence is the alternative hypothesis, so the TOST p-value is the
+    LARGER of the two one-sided p-values: both nulls (diff <= -margin and
+    diff >= +margin) must be rejected for the operation to be called
+    equivalent. Small p means equivalent, which is the opposite of the usual
+    reading and is easy to misinterpret when scanning the CSV.
+    """
+    if not np.isfinite(se_pct) or se_pct <= 0 or not np.isfinite(dof):
+        return float("nan")
+    p_lower = stats.t.sf((diff_pct + margin) / se_pct, dof)
+    p_upper = stats.t.cdf((diff_pct - margin) / se_pct, dof)
+    return float(max(p_lower, p_upper))
+
+
+def welch(x, y, margin=1.0):
     """Relative difference (percent of board 1) with Welch CI and TOST."""
     nx, ny = len(x), len(y)
     mx, my = x.mean(), y.mean()
@@ -123,9 +139,14 @@ def welch(x, y):
         # estimated. Either way the interval has zero width -- but every key
         # the caller reads must still be present.
         diff_pct = 0.0 if mx == my else 100.0 * (my - mx) / mx
+        # p_tost is undefined with zero standard error: with no dispersion
+        # there is no test statistic to place against a margin. Report NaN
+        # rather than a fabricated 0 or 1 so the family-wise correction below
+        # excludes these rows explicitly instead of silently crediting them.
         return dict(diff_pct=diff_pct, ci_lo=diff_pct, ci_hi=diff_pct,
                     tost_lo=diff_pct, tost_hi=diff_pct,
-                    p=(1.0 if mx == my else 0.0), dof=np.nan)
+                    p=(1.0 if mx == my else 0.0), p_tost=float("nan"),
+                    dof=np.nan)
     dof = (vx / nx + vy / ny) ** 2 / (
         (vx / nx) ** 2 / (nx - 1) + (vy / ny) ** 2 / (ny - 1))
     diff = my - mx
@@ -139,6 +160,11 @@ def welch(x, y):
         tost_lo=100.0 * (diff - tcrit90 * se) / mx,
         tost_hi=100.0 * (diff + tcrit90 * se) / mx,
         p=p, dof=dof,
+        # TOST p-value: the larger of the two one-sided tests against
+        # +/-margin. The CI-containment rule above and this p-value are two
+        # readings of the same test, but only the p-value can be carried into
+        # a family-wise correction, which is why both are reported.
+        p_tost=tost_p(100.0 * diff / mx, 100.0 * se / mx, dof, margin),
     )
 
 
@@ -179,7 +205,7 @@ def main():
         y = d2.loc[m2, "time_us"].to_numpy(float)
         if len(x) < 2 or len(y) < 2:
             continue
-        r = welch(x, y)
+        r = welch(x, y, margin=args.margin)
         cv1 = 100 * x.std(ddof=1) / x.mean()
         cv2 = 100 * y.std(ddof=1) / y.mean()
         # ML-DSA signing is rejection-sampling dominated: reported, but it
@@ -241,7 +267,7 @@ def main():
             cv1_pct=cv1, cv2_pct=cv2,
             diff_pct=r["diff_pct"], ci95_lo=r["ci_lo"], ci95_hi=r["ci_hi"],
             tost90_lo=r["tost_lo"], tost90_hi=r["tost_hi"],
-            p_welch=r["p"], informative=informative,
+            p_welch=r["p"], p_tost=r["p_tost"], informative=informative,
             verdict=verdict, equivalent=(verdict == "equivalent"),
         ))
 
@@ -254,6 +280,48 @@ def main():
     diff = inf[inf.verdict == "different"]
     incon = inf[inf.verdict == "inconclusive"]
     worst = eqv.loc[eqv.diff_pct.abs().idxmax()] if len(eqv) else None
+
+    # Family-wise error control over the equivalence tests. With equivalence
+    # as the alternative, an uncorrected family inflates the risk of a FALSE
+    # EQUIVALENCE -- the dangerous direction here, since the paper's claim is
+    # that the boards agree. Rows with a NaN TOST p (zero-variance operations)
+    # are excluded from the family rather than counted as passing.
+    fam = eqv[eqv.p_tost.notna()]
+    m_tests = int(len(fam))
+    # Two family sizes are in play and they differ. m_tests counts operations
+    # with a defined TOST p-value; n_claims counts every equivalence verdict,
+    # including zero-variance operations that agree exactly and so have no
+    # test statistic. We correct against the LARGER count: dividing alpha by
+    # the full number of claims is stricter than dividing by the number of
+    # tests, so a family that survives it also survives the narrower reading.
+    n_claims = int(len(eqv))
+    fwe = {"n_tests_with_p": m_tests, "n_equivalence_claims": n_claims,
+           "n_exact_zero_variance": n_claims - m_tests,
+           "correction_family_size": n_claims, "alpha": 0.05}
+    if m_tests:
+        ps = np.sort(fam.p_tost.values)
+        bonf_thresh = 0.05 / n_claims
+        # Holm step-down: reject while p_(i) < alpha/(m-i); the first failure
+        # stops the procedure and every later hypothesis is retained.
+        holm_all = bool(np.all(ps < 0.05 / (n_claims - np.arange(m_tests))))
+        fwe.update(
+            max_p_tost=float(ps[-1]),
+            bonferroni_threshold=float(bonf_thresh),
+            all_survive_bonferroni=bool(ps[-1] < bonf_thresh),
+            all_survive_holm=holm_all,
+            margin_orders_of_magnitude=(
+                float(np.log10(bonf_thresh / ps[-1])) if ps[-1] > 0 else None),
+        )
+        worst_row = fam.loc[fam.p_tost.idxmax()]
+        fwe["largest_p_operation"] = (
+            f"{worst_row.algorithm} {worst_row.operation} "
+            f"{worst_row.security_level}")
+        print(f"\nfamily-wise ({n_claims} equivalence claims, {m_tests} with a "
+              f"defined TOST p, alpha=0.05): "
+              f"max TOST p = {ps[-1]:.3g} ({fwe['largest_p_operation']}) "
+              f"vs Bonferroni {bonf_thresh:.3g} -> "
+              f"{'all survive' if fwe['all_survive_bonferroni'] else 'NOT ALL SURVIVE'}"
+              f"; Holm: {'all reject' if holm_all else 'NOT ALL'}")
 
     print(f"{'operation':34s} {'board1':>10s} {'board2':>10s} "
           f"{'diff%':>8s} {'90% CI':>18s}  verdict")
@@ -272,6 +340,7 @@ def main():
         "n_equivalent": int(len(eqv)),
         "n_different": int(len(diff)),
         "n_inconclusive": int(len(incon)),
+        "family_wise_correction": fwe,
         "inconclusive_operations": [
             f"{r.algorithm} {r.operation} {r.security_level}"
             for _, r in incon.iterrows()],

@@ -9,6 +9,19 @@
   "n_equivalent": 23,
   "n_different": 0,
   "n_inconclusive": 2,
+  "family_wise_correction": {
+    "n_tests_with_p": 21,
+    "n_equivalence_claims": 23,
+    "n_exact_zero_variance": 2,
+    "correction_family_size": 23,
+    "alpha": 0.05,
+    "max_p_tost": 1.3065288595687034e-07,
+    "bonferroni_threshold": 0.002173913043478261,
+    "all_survive_bonferroni": true,
+    "all_survive_holm": true,
+    "margin_orders_of_magnitude": 4.221123161133756,
+    "largest_p_operation": "RSA-2048 decrypt 2048"
+  },
   "inconclusive_operations": [
     "RSA-2048 keygen 2048",
     "randombytes generate 1"
