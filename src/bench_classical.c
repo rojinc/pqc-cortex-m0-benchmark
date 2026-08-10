@@ -52,9 +52,12 @@ static void bench_rsa2048(void)
 
     printf("# --- RSA-2048 ---\n");
 
-    /* Key generation — reduced to 5 runs because RSA keygen is ~50s per run on M0+ */
-    uint32_t _rsa_kg_times[5];
-    for (int _i = 0; _i < 5; _i++)
+    /* Key generation — few runs because RSA keygen is ~50s per run on M0+.
+     * Count is NUM_RUNS_RSA_KEYGEN (default 5, the published Campaign A value)
+     * so raising the global sample count does not accidentally turn this into
+     * a multi-hour operation. */
+    uint32_t _rsa_kg_times[NUM_RUNS_RSA_KEYGEN];
+    for (int _i = 0; _i < NUM_RUNS_RSA_KEYGEN; _i++)
     {
         uint32_t _start = time_us_32();
         mbedtls_pk_init(&pk);
@@ -70,7 +73,7 @@ static void bench_rsa2048(void)
     {
         uint64_t _sum = 0;
         uint32_t _min = UINT32_MAX, _max = 0;
-        for (int _i = 0; _i < 5; _i++)
+        for (int _i = 0; _i < NUM_RUNS_RSA_KEYGEN; _i++)
         {
             _sum += _rsa_kg_times[_i];
             if (_rsa_kg_times[_i] < _min)
@@ -78,9 +81,11 @@ static void bench_rsa2048(void)
             if (_rsa_kg_times[_i] > _max)
                 _max = _rsa_kg_times[_i];
         }
-        printf("# SUMMARY RSA-2048 keygen 2048: mean=%.0f min=%lu max=%lu (n=5)\n", (double)_sum / 5.0, (unsigned long)_min, (unsigned long)_max);
+        printf("# SUMMARY RSA-2048 keygen 2048: mean=%.0f min=%lu max=%lu (n=%d)\n",
+               (double)_sum / (double)NUM_RUNS_RSA_KEYGEN,
+               (unsigned long)_min, (unsigned long)_max, NUM_RUNS_RSA_KEYGEN);
     }
-    /* (original 30-run BENCH_RUN replaced with 5-run loop above) */
+    /* (original 30-run BENCH_RUN replaced with the loop above) */
 
     /* For encrypt/decrypt and sign/verify, generate one key to reuse */
     mbedtls_pk_init(&pk);
@@ -112,7 +117,9 @@ static void bench_rsa2048(void)
     mbedtls_rsa_pkcs1_encrypt(mbedtls_pk_rsa(pk), rng_wrapper, NULL,
                               sizeof(plaintext), plaintext, ciphertext);
 
-    BENCH_RUN("RSA-2048", "decrypt", 2048, {
+    /* Decrypt is ~3.4 s per sample, so it uses its own count rather than the
+     * global one — see NUM_RUNS_RSA_DEC in bench_harness.h. */
+    BENCH_RUN_EXTENDED("RSA-2048", "decrypt", 2048, NUM_RUNS_RSA_DEC, {
         ret = mbedtls_rsa_pkcs1_decrypt(mbedtls_pk_rsa(pk), rng_wrapper, NULL,
                                         &olen, ciphertext, decrypted,
                                         sizeof(decrypted));

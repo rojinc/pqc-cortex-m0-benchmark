@@ -153,6 +153,38 @@ target_include_directories(mldsa87 PUBLIC ${MLDSA87_DIR} ${PQCLEAN_COMMON})
 set(CUSTOM_LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/memmap_custom.ld)
 
 # ============================================================
+# Sample counts (Campaign A defaults; override for Campaign C)
+#
+#   Campaign A (published dataset, reproduces as-is):
+#       cmake ..
+#   Campaign C (two-unit comparison):
+#       cmake -DBENCH_N=1000 -DBENCH_N_SIGN=1000 ..
+#
+# Leaving these unset MUST reproduce Campaign A, so the defaults are
+# deliberately absent here rather than set to 30/100 — bench_harness.h
+# supplies those and this block only overrides when asked.
+# ============================================================
+set(BENCH_N "" CACHE STRING "Runs per deterministic operation (default 30)")
+set(BENCH_N_SIGN "" CACHE STRING "Runs per ML-DSA signing operation (default 100)")
+set(BENCH_N_RSA_DEC "" CACHE STRING "Runs for RSA-2048 decrypt (default = BENCH_N)")
+set(BENCH_N_RSA_KEYGEN "" CACHE STRING "Runs for RSA-2048 keygen (default 5)")
+
+function(bench_apply_sample_counts target)
+    if(NOT BENCH_N STREQUAL "")
+        target_compile_definitions(${target} PRIVATE NUM_RUNS=${BENCH_N})
+    endif()
+    if(NOT BENCH_N_SIGN STREQUAL "")
+        target_compile_definitions(${target} PRIVATE NUM_RUNS_DSA_SIGN=${BENCH_N_SIGN})
+    endif()
+    if(NOT BENCH_N_RSA_DEC STREQUAL "")
+        target_compile_definitions(${target} PRIVATE NUM_RUNS_RSA_DEC=${BENCH_N_RSA_DEC})
+    endif()
+    if(NOT BENCH_N_RSA_KEYGEN STREQUAL "")
+        target_compile_definitions(${target} PRIVATE NUM_RUNS_RSA_KEYGEN=${BENCH_N_RSA_KEYGEN})
+    endif()
+endfunction()
+
+# ============================================================
 # Blink test — verify toolchain works (uses default linker)
 # ============================================================
 add_executable(blink src/blink.c)
@@ -209,3 +241,26 @@ pico_enable_stdio_uart(bench_mldsa 0)
 target_compile_definitions(bench_mldsa PRIVATE PICO_STACK_SIZE=0x30000)
 target_compile_options(bench_mldsa PRIVATE -fstack-usage)
 pico_set_linker_script(bench_mldsa ${CUSTOM_LINKER_SCRIPT})
+
+bench_apply_sample_counts(bench_classical)
+bench_apply_sample_counts(bench_mlkem)
+bench_apply_sample_counts(bench_mldsa)
+
+# ============================================================
+# Benchmark: randombytes() isolation timing (reviewer item 5)
+#
+# Tests directly whether a single ROSC-backed randombytes() call takes
+# constant time, rather than assuming it. Cheap to run — a few minutes,
+# dominated by the inter-row USB delay rather than by computation.
+# ============================================================
+add_executable(bench_rng src/bench_rng.c src/randombytes_pico.c)
+target_include_directories(bench_rng PRIVATE src)
+target_link_libraries(bench_rng
+    pico_stdlib
+    pqclean_common
+)
+pico_add_extra_outputs(bench_rng)
+pico_enable_stdio_usb(bench_rng 1)
+pico_enable_stdio_uart(bench_rng 0)
+target_compile_definitions(bench_rng PRIVATE PICO_STACK_SIZE=0x10000)
+pico_set_linker_script(bench_rng ${CUSTOM_LINKER_SCRIPT})
