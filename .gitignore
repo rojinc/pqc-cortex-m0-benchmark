@@ -1,6 +1,8 @@
 # Build artifacts
 build/
+build-*/
 local_test/build/
+local_test/build-*/
 *.uf2
 *.elf
 *.bin
@@ -25,6 +27,9 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+# Scratch image previews from interactive analysis sessions
+_view_*.png
 
 # External libraries (cloned separately, not tracked)
 pico-sdk/
