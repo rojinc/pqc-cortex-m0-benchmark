@@ -2,6 +2,8 @@
 
 This guide reproduces the firmware build, data capture, and data validation pipeline used in the manuscript.
 
+> **Video walkthrough:** [youtu.be/u8MjAwdINa4](https://youtu.be/u8MjAwdINa4) shows the build, BOOTSEL flashing and serial capture end to end.
+
 ## 1) Prerequisites
 
 ### Hardware

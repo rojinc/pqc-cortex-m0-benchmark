@@ -7,6 +7,12 @@ Systematic benchmarking of **NIST-standardized ML-KEM (FIPS 203)** and **ML-DSA 
 
 This repository provides benchmark firmware, reproducibility scripts, and processed datasets for the above paper.
 
+## Video Walkthrough
+
+[Reproducing the RP2040 data collection, step by step (YouTube)](https://youtu.be/u8MjAwdINa4)
+
+Starting from an empty folder, the video clones this repository at commit `3d75d76`, fetches PQClean and the Pico SDK, builds the firmware, flashes a Pico with BOOTSEL and captures the ML-KEM and ML-DSA timings over USB serial. It uses a short run (30 timings per operation, 100 signatures); build with `-DBENCH_N=1000 -DBENCH_N_SIGN=1000` for the full campaign.
+
 ## Author
 
 **Rojin Chhetri** ([ORCID: 0009-0005-2757-3436](https://orcid.org/0009-0005-2757-3436))
